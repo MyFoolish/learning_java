@@ -38,10 +38,14 @@ public class ShiroTest {
         SimpleAccountRealm simpleAccountRealm = new SimpleAccountRealm();   //不支持添加权限
         simpleAccountRealm.addAccount("passerby", "123456","admin","user");
 
+        // 1、构建 SecurityManager 环境
         DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        // 把 Realm 设置到当前 SecurityManager 环境中
         defaultSecurityManager.setRealm(simpleAccountRealm);
+        // 2、主体提交认证请求
         SecurityUtils.setSecurityManager(defaultSecurityManager);
         Subject subject = SecurityUtils.getSubject();
+
         UsernamePasswordToken token = new UsernamePasswordToken("passerby", "123456");
         subject.login(token);
         System.out.println("isAuthenticated : " + subject.isAuthenticated());
@@ -69,6 +73,12 @@ public class ShiroTest {
         subject.checkPermissions("user:delete","user:update");
     }
 
+    /*DruidDataSource dataSource = new DruidDataSource();
+    {
+        dataSource.setUrl("jdbc:mysql://localhost:3306/shiro?useSSL=false");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+    }*/
     @Test
     public void JdbcRealmTest() {
         DruidDataSource dataSource = new DruidDataSource();
@@ -78,7 +88,7 @@ public class ShiroTest {
 
         JdbcRealm jdbcRealm = new JdbcRealm();
         jdbcRealm.setDataSource(dataSource);
-        //权限的开关 默认为false，此时不会从数据库中查询权限数据，只有在true时才会去数据库查询
+        //权限的开关 默认为 false，此时不会从数据库中查询权限数据，只有在 true 时才会去数据库查询
         jdbcRealm.setPermissionsLookupEnabled(true);
 
 //        String sql = "select password from users where username=?";
@@ -97,7 +107,7 @@ public class ShiroTest {
         SecurityUtils.setSecurityManager(defaultSecurityManager);
         Subject subject = SecurityUtils.getSubject();
 //        UsernamePasswordToken token = new UsernamePasswordToken("passerby", "123456");
-        UsernamePasswordToken token = new UsernamePasswordToken("myfoolish", "123");
+        UsernamePasswordToken token = new UsernamePasswordToken("xwCoding", "123");
         subject.login(token);
         System.out.println("isAuthenticated : " + subject.isAuthenticated());
 
@@ -107,15 +117,17 @@ public class ShiroTest {
         subject.checkPermissions("user:select");
     }
 
+    // 自定义Realm 并加密
     @Test
     public void CustomRealmTest() {
         CustomRealm customRealm = new CustomRealm();
         DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
         defaultSecurityManager.setRealm(customRealm);
 
+        // encrypt 加密
         HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-        hashedCredentialsMatcher.setHashAlgorithmName("md5");   //加密算法
-        hashedCredentialsMatcher.setHashIterations(1);  //加密次数
+        hashedCredentialsMatcher.setHashAlgorithmName("md5");   // 设置加密算法的名称
+        hashedCredentialsMatcher.setHashIterations(1);  // 设置加密算法的次数
         customRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 
         SecurityUtils.setSecurityManager(defaultSecurityManager);

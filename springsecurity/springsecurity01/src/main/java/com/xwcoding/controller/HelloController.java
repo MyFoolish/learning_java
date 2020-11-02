@@ -48,6 +48,6 @@ public class HelloController {
         } else {
             currentUser = principal.toString();
         }
-        return "Hello currentUser是 :" + currentUser;
+        return "Hello currentUser is ：" + currentUser;
     }
 }

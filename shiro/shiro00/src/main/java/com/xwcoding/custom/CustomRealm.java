@@ -30,7 +30,9 @@ public class CustomRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         String username = (String) principalCollection.getPrimaryPrincipal();
+        // 从数据库中或者缓存中获取角色数据
         Set<String> roles = getRolesByUsername(username);
+        // 从数据库中或者缓存中获取权限数据
         Set<String> permissions = getPermissionsByUsername(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.setRoles(roles);
@@ -39,6 +41,7 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     private Set<String> getPermissionsByUsername(String username) {
+        // 实际开发中访问数据库获取，此处学习，故模拟从数据库中或者缓存中获取权限数据
         Set<String> set = new HashSet<>();
         set.add("user:add");
         set.add("user:delete");
@@ -48,6 +51,7 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     private Set<String> getRolesByUsername(String username) {
+        // 实际开发中访问数据库获取，此处学习，故模拟从数据库中或者缓存中获取角色数据
         Set<String> set = new HashSet<>();
         set.add("admin");
         set.add("user");
@@ -65,13 +69,15 @@ public class CustomRealm extends AuthorizingRealm {
     }
     /**
      * 认证
-     * @param authenticationToken
+     * @param authenticationToken 主体传过来的认证信息
      * @return
      * @throws AuthenticationException
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        // 1、从主体传过来的认证信息中，获取用户名
         String username = (String) authenticationToken.getPrincipal();
+        // 2、通过用户名到数据库获取凭证
         String password = getPasswordByUsername(username);
         if (password == null) {
             return null;
@@ -82,6 +88,7 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     private String getPasswordByUsername(String username) {
+        // 实际开发需要查询数据库，此处用于学习，模拟数据库查询凭证
         return userMap.get(username);
     }
 
